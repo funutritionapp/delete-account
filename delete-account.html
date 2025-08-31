@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Account - Funutrition</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #FFE4B5 0%, #FFFACD 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            max-width: 500px;
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 3px solid #FFCB45;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #FFCB45 0%, #FFB800 100%);
+            padding: 30px 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .warning-box {
+            background: #FFF3CD;
+            border: 2px solid #FFE69C;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .warning-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .warning-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: #856404;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #E5E5E5;
+            border-radius: 16px;
+            font-size: 16px;
+            font-family: inherit;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            background: #FAFAFA;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #FFCB45;
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 203, 69, 0.2);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 25px;
+            padding: 16px;
+            background: #F8F9FA;
+            border-radius: 16px;
+            border: 2px solid #E5E5E5;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #FFCB45;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .checkbox-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .delete-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #FF5A44 0%, #E14A35 100%);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 800;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .delete-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 90, 68, 0.3);
+            background: linear-gradient(135deg, #E14A35 0%, #CC3F2A 100%);
+        }
+
+        .delete-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            padding: 16px;
+            border-radius: 16px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .success {
+            background: #D1F2EB;
+            color: #0C5F4C;
+            border: 2px solid #7DCEA0;
+        }
+
+        .error {
+            background: #FADBD8;
+            color: #922B21;
+            border: 2px solid #F1948A;
+        }
+
+        .loading {
+            background: #EBF3FD;
+            color: #1F4788;
+            border: 2px solid #85C1E9;
+        }
+
+        .support-link {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #F0F0F0;
+        }
+
+        .support-link a {
+            color: #FFCB45;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .support-link a:hover {
+            color: #FFB800;
+        }
+
+        .logo {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                margin: 10px;
+                border-radius: 16px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 28px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Success animation */
+        .success-icon {
+            font-size: 64px;
+            color: #28A745;
+            text-align: center;
+            margin: 20px 0;
+            animation: bounce 0.6s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 53%, 80%, 100% {
+                transform: translate3d(0, 0, 0);
+            }
+            40%, 43% {
+                transform: translate3d(0, -20px, 0);
+            }
+            70% {
+                transform: translate3d(0, -10px, 0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Funutrition</h1>
+            <p>Account Deletion</p>
+        </div>
+        
+        <div class="content">
+            <div class="warning-box">
+                <div class="warning-icon">⚠️</div>
+                <div class="warning-text">
+                    <strong>This action is permanent!</strong><br>
+                    All your data, including your child's progress, meal logs, activity records, and photos will be permanently deleted and cannot be recovered.
+                </div>
+            </div>
+
+            <div id="message"></div>
+
+            <form id="deleteForm">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" required placeholder="Enter your registered email">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required placeholder="Enter your password">
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="confirm" required>
+                    <label for="confirm">
+                        I understand this action is permanent and will delete all data associated with my Funutrition account, including my child's progress and achievements.
+                    </label>
+                </div>
+                
+                <button type="submit" class="delete-btn" id="deleteBtn">
+                    Delete My Account Forever
+                </button>
+            </form>
+            
+            <div class="support-link">
+                <a href="mailto:support@funutrition.com">Need help? Contact our support team</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Replace with your actual Supabase configuration
+        const supabaseUrl = 'https://znqoeyjtaxlubbtlmffn.supabase.co'
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpucW9leWp0YXhsdWJidGxtZmZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc5MTY4NjYsImV4cCI6MjA2MzQ5Mjg2Nn0.sjHTfsh3E7ZL5wUG7PVxE_Yk_789uaipQ-YP0ZKPLg4'
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey)
+
+        const form = document.getElementById('deleteForm')
+        const messageDiv = document.getElementById('message')
+        const deleteBtn = document.getElementById('deleteBtn')
+
+        function showMessage(message, type) {
+            let icon = '';
+            if (type === 'success') icon = '✅ ';
+            if (type === 'error') icon = '❌ ';
+            if (type === 'loading') icon = '⏳ ';
+            
+            messageDiv.innerHTML = `<div class="${type}">${icon}${message}</div>`
+            messageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+        }
+
+        function setButtonLoading(loading) {
+            if (loading) {
+                deleteBtn.disabled = true
+                deleteBtn.innerHTML = '<span class="spinner"></span>Deleting Account...'
+            } else {
+                deleteBtn.disabled = false
+                deleteBtn.innerHTML = 'Delete My Account Forever'
+            }
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault()
+            
+            const email = document.getElementById('email').value.trim()
+            const password = document.getElementById('password').value
+            const confirmed = document.getElementById('confirm').checked
+            
+            // Validation
+            if (!email || !password) {
+                showMessage('Please fill in all fields.', 'error')
+                return
+            }
+            
+            if (!confirmed) {
+                showMessage('Please confirm that you understand this action is permanent.', 'error')
+                return
+            }
+
+            setButtonLoading(true)
+            showMessage('Verifying your credentials...', 'loading')
+            
+            try {
+                // Step 1: Sign in the user to verify credentials
+                const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                })
+
+                if (signInError) {
+                    throw new Error('Invalid email or password. Please check your credentials.')
+                }
+
+                if (!authData.user) {
+                    throw new Error('Authentication failed. Please try again.')
+                }
+
+                showMessage('Credentials verified. Deleting account data...', 'loading')
+                
+                // Step 2: Call the delete function
+                const { data: deleteData, error: deleteError } = await supabase.rpc('delete_user_account')
+
+                if (deleteError) {
+                    throw new Error(`Failed to delete account: ${deleteError.message}`)
+                }
+
+                if (deleteData && !deleteData.success) {
+                    throw new Error(deleteData.error || 'Failed to delete account data')
+                }
+
+                // Step 3: Sign out the user
+                await supabase.auth.signOut()
+
+                // Success message
+                messageDiv.innerHTML = `
+                    <div class="success">
+                        <div class="success-icon">✅</div>
+                        <strong>Account Successfully Deleted!</strong><br>
+                        Your Funutrition account and all associated data have been permanently deleted. 
+                        Thank you for using our app to support your child's nutrition journey.
+                    </div>
+                `
+                
+                // Hide the form
+                form.style.display = 'none'
+                
+                // Optional: Redirect after a delay
+                setTimeout(() => {
+                    window.location.href = 'https://your-app-website.com' // Replace with your main website
+                }, 5000)
+                
+            } catch (error) {
+                console.error('Delete account error:', error)
+                showMessage(error.message, 'error')
+                setButtonLoading(false)
+            }
+        })
+
+        // Auto-focus first input
+        document.getElementById('email').focus()
+        
+        // Add some fun interactions
+        document.getElementById('email').addEventListener('input', function() {
+            if (this.value.includes('@')) {
+                this.style.borderColor = '#28A745'
+            } else {
+                this.style.borderColor = '#E5E5E5'
+            }
+        })
+
+        document.getElementById('password').addEventListener('input', function() {
+            if (this.value.length >= 6) {
+                this.style.borderColor = '#28A745'
+            } else {
+                this.style.borderColor = '#E5E5E5'
+            }
+        })
+    </script>
+</body>
+</html>
